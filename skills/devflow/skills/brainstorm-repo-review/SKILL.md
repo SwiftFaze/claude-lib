@@ -1,6 +1,6 @@
 ---
 name: brainstorm-repo-review
-description: Brainstorm the recommended actions of a repo-review HTML report with the user, the same way brainstorm-issue does (grounded in the code, then grilling rounds), and write the outcome into that same report instead of filing anything. The outcome is the decisions taken and issue drafts in the repo's own issue template, with priority, labels, milestone and dependencies. Use when the user wants to reply to, react to, discuss, triage or turn into issues the plan or findings of a repo review ("reply to this plan", "brainstorm the review", "let's go through the actions", "turn the review into issues"), or names /brainstorm-repo-review.
+description: Brainstorm the recommended actions of a repo-review HTML report with the user, the same way brainstorm-issue does (grounded in the code, then grilling rounds), and write the outcome into that same report instead of filing anything. The outcome is the decisions taken and issue drafts in the repo's own issue template, with priority, labels, milestone and dependencies. Use when the user wants to reply to, react to, discuss, triage or turn into issues the plan or findings of a repo review ("reply to this plan", "brainstorm the review", "let's go through the actions", "turn the review into issues"), or names /devflow:brainstorm-repo-review.
 argument-hint: "[report path | latest] [action numbers or finding IDs, e.g. 1-3 or T-16]"
 ---
 
@@ -25,7 +25,7 @@ This holds even if the user asks mid-session. In that case, say that filing is o
 
 ## Step 0: Pick the report and the slice
 
-- **Report:** a path the user gives. Otherwise use `latest`, the newest `history[].report` in `~/repo-reviews/registry.json` for the current repo that is an `.html` file. If there is only a Markdown report, say so and suggest running `/repo-review` first.
+- **Report:** a path the user gives. Otherwise use `latest`, the newest `history[].report` in `~/repo-reviews/registry.json` for the current repo that is an `.html` file. If there is only a Markdown report, say so and suggest running `/devflow:repo-review` first.
 - **Slice:** the action numbers or finding IDs the user names. Otherwise use the whole "Recommended actions" list. If that list has more than ~5 actions, the first grilling round asks which ones to take now.
 - Read the report: header, findings, To check, Recommended actions, and the `review-data` JSON. If the report already has a `brainstorm-data` block, read it as well. Earlier decisions stand unless the user reopens them, and a draft that already exists is updated, not duplicated.
 
@@ -74,7 +74,7 @@ Read `assets/brainstorm-section.html` (next to this file) and follow its comment
 - Each session adds a dated block with its decisions table. Drafts are updated in place by their `I-xx` ID.
 - Fill the `brainstorm-data` JSON block and validate it (`node -e` / `python -c`). Escape `<`, `>` and `&` in the HTML. The Markdown body in each draft's `<pre>` must be exactly what would be filed.
 - In each covered finding card, add a line `<p class="drafted">Drafted as <a href="#I-01">I-01</a></p>` to the card's body. Don't change any other part of the review.
-- Run the repo-review screenshot check (`node ~/.claude/skills/repo-review/scripts/screenshot.cjs <report> <scratch>`) and look at the Brainstorm section.
+- Run the repo-review screenshot check (`node ~/.claude/skills/devflow/skills/repo-review/scripts/screenshot.cjs <report> <scratch>`) and look at the Brainstorm section.
 
 ## Step 5: Report back
 

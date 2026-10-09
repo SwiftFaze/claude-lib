@@ -1,9 +1,9 @@
 ---
 name: resume-issue
-description: Resume in-flight work on a GitHub issue from a clean session — resolves the issue to its branch and specs/intent/<slug>.md, reconciles that doc's Status checkboxes against what the repo actually contains, and picks the pipeline back up at the first genuinely unfinished step. Use when returning to an issue started earlier with /spec-intent, not to start new work.
+description: Resume in-flight work on a GitHub issue from a clean session — resolves the issue to its branch and specs/intent/<slug>.md, reconciles that doc's Status checkboxes against what the repo actually contains, and picks the pipeline back up at the first genuinely unfinished step. Use when returning to an issue started earlier with /devflow:spec-intent, not to start new work.
 ---
 
-Counterpart to `/spec-intent`: that skill starts an issue, this one picks it
+Counterpart to `/devflow:spec-intent`: that skill starts an issue, this one picks it
 back up after a session ended mid-flight (usually out of context). Ends with
 work resumed at the correct `.claude/workflow.md` step, not with a plan to
 resume it.
@@ -28,7 +28,7 @@ gh pr list --state all --search "<n>" --json number,state,headRefName,body
 - **Intent doc:** the `grep` hit. Intent docs carry
   `**Source:** [GitHub issue #N](...)`, so this is the reliable link — the slug
   need not match the issue title. Zero hits means Step 1 never finished: say so
-  and offer `/spec-intent <n>` instead; this skill has nothing to resume.
+  and offer `/devflow:spec-intent <n>` instead; this skill has nothing to resume.
   More than one hit means the issue produced several slugs — report all of
   them and ask which to resume rather than picking one.
 - **Branch:** from `gh issue develop --list`. If that's empty, fall back to
@@ -41,7 +41,7 @@ gh pr list --state all --search "<n>" --json number,state,headRefName,body
 Run `git status --short` and `git branch --show-current`.
 
 First check `git worktree list`: if the branch is already checked out in a
-worktree (a `/spec-intent … parallel` start), `git checkout` will refuse it.
+worktree (a `/devflow:spec-intent … parallel` start), `git checkout` will refuse it.
 Work from that worktree's path instead — tell the user to restart the session
 there if this one isn't — and apply the rules below to it.
 
@@ -53,7 +53,7 @@ there if this one isn't — and apply the rules below to it.
 - **Wrong branch + clean tree:** `git checkout <branch>`, then
   `git pull --ff-only` (a squash-merge upstream may have moved things).
 - **No branch exists** but an intent doc does: the previous session died
-  between the doc and the branch. Create it per `/spec-intent` Step 3
+  between the doc and the branch. Create it per `/devflow:spec-intent` Step 3
   (`gh issue develop <n> --name <branch> --base <base branch> --checkout`).
 
 ## Step 3 — Reconcile the Status block against the repo
@@ -130,7 +130,7 @@ Checkpoint at each step boundary and suggest clearing, per
 `.claude/workflow.md`'s session-management notes — a resumed session is already
 carrying the reconciliation you just did.
 
-**Resume point is Step 2 → hand back instead of running `/spec-feature`.** Its
+**Resume point is Step 2 → hand back instead of running `/devflow:spec-feature`.** Its
 `model: opus` pin covers only the invoking turn; every grilling round after the
 user's first answer would run on this session's model. Tell the user to switch
-with `/model opus` and run `/spec-feature <slug>` themselves.
+with `/model opus` and run `/devflow:spec-feature <slug>` themselves.

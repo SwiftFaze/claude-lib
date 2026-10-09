@@ -3,18 +3,47 @@
 Reusable Claude Code skills, agents and tools for a spec-first, agent-driven
 development pipeline: intent doc → Gherkin spec → test-first implementation
 (`coder`) → clean-code hardening and mutation testing (`hardener`) → PR, with
-GitHub issues, milestones and a project board for planning.
+GitHub issues, milestones, a project board and repo reviews for planning.
 
 ## Layout
 
 This repo is checked out as `~/.claude` itself. Its `.gitignore` ignores
-everything (credentials, history, sessions) except the library:
+everything (credentials, history, sessions, settings) except the library:
 
-- `skills/`, `agents/`: user-level, so Claude Code loads them in every project.
-- `lib/`: per-project templates that only take effect once copied into a
-  project (below).
+| Path                  | What it is                                                         |
+|-----------------------|--------------------------------------------------------------------|
+| `skills/devflow/`  | The **`devflow` plugin**: `.claude-plugin/plugin.json`, `skills/`, `agents/` |
+| `lib/`                | Per-project templates: `workflow.md`, `tools/`, `specs/`           |
 
-## Set up a project
+A folder in `~/.claude/skills/` that has a `.claude-plugin/plugin.json` loads
+as a plugin in every session, with no install step (it shows up as
+`devflow@skills-dir`). Edits apply at the next session or after
+`/reload-plugins`.
+
+## Names: everything is prefixed
+
+Plugin skills and agents carry the plugin name, so they never collide with a
+project's own skills of the same name:
+
+- Skills: `/devflow:spec-intent`, `/devflow:brainstorm-issue`, …
+- Agents: `devflow:coder`, `devflow:hardener`
+
+In a project that has its own `brainstorm-issue` (for example), `/brainstorm-issue`
+runs the project's and `/devflow:brainstorm-issue` runs this one.
+
+### Turn the library off in one project
+
+From that project's directory:
+
+```
+claude plugin disable devflow@skills-dir --scope local
+```
+
+or open `/plugin` → Installed → `devflow` and disable it there. Local scope
+writes to the project's `.claude/settings.local.json`, so other projects are
+unaffected. `claude plugin enable … --scope local` turns it back on.
+
+## Set up a project for the pipeline
 
 | From `~/.claude/lib` | To the project          |
 |----------------------|-------------------------|
@@ -22,7 +51,7 @@ everything (credentials, history, sessions) except the library:
 | `tools/`             | `.claude/tools/`        |
 | `specs/`             | `specs/` (repo root)    |
 
-The pipeline skills and agents stay global; they read the project's
+The pipeline skills and agents stay in the plugin; they read the project's
 `.claude/workflow.md`. Then:
 
 1. Fill in the **Project configuration** table and the **Constraints** values
@@ -45,12 +74,15 @@ hardener → PR), `spec-intent-auto` (the whole standard path unattended),
 **Planning skills**: `brainstorm-issue`, `brainstorm-milestone`,
 `audit-planning`, `close-milestone`, `grilling`.
 
-**Standalone skills**: `uncle-bob-craft` (design review lens),
-`token-usage-analyzer` (session transcript cost audit).
+**Review skills**: `repo-review` (dated HTML report on a repo's activity or
+current state, with a cross-repo registry in `~/repo-reviews/`),
+`brainstorm-repo-review` (turn a review's actions into decisions and issue
+drafts), `uncle-bob-craft` (design review lens), `token-usage-analyzer`
+(session transcript cost audit).
 
 **Agents**: `coder` (haiku), `hardener` (sonnet).
 
-**Tools** (`bash`; the gates assume a Maven/Java build):
+**Tools** in `lib/tools/` (`bash`; the gates assume a Maven/Java build):
 
 - `check-clean.sh`: the diff-scoped Clean Code gate (PMD, CPD, SpotBugs,
   text smells, optional CRAP) plus the judgment checklist.
@@ -63,3 +95,6 @@ hardener → PR), `spec-intent-auto` (the whole standard path unattended),
 - `check-jqwik-canary.sh`: pins jqwik's agent-directed console output to an
   audited text (only for projects using jqwik).
 - `set-project-field.sh`: sets a project-board field and reads it back.
+
+`.gitattributes` keeps every `.sh` file on LF line endings, so the scripts run
+under bash from a Windows checkout.

@@ -4,13 +4,13 @@ description: Run Steps 4-7 of the spec-first pipeline on the current feature bra
 ---
 
 The entry point for Steps 4-7 of `.claude/workflow.md`: implementation,
-hardening and the PR. Counterpart to `/spec-intent` and `/spec-feature`, which
+hardening and the PR. Counterpart to `/devflow:spec-intent` and `/devflow:spec-feature`, which
 own Steps 1-2. It owns the **sequence** and the **verification**. The work stays
-in `.claude/agents/coder.md` and `hardener.md`, and the mechanical gates stay in
+in the plugin's `agents/coder.md` and `hardener.md`, and the mechanical gates stay in
 the verify command and the Clean Code gate (`.claude/workflow.md` project
 configuration): name them here, never restate their thresholds or how to pass
 them. Each agent's model, tools, ownership and reading scope live in
-`.claude/agents/`; don't restate them.
+the plugin's `agents/`; don't restate them.
 
 Takes no required input. It works on the checked-out branch: the slug is the
 branch name minus its `feat/`/`fix/`/`docs/` prefix, the issue number comes from
@@ -22,7 +22,7 @@ as the baseline (a hand-written commit, or one already built and playtested).
 
 1. **Refuse without a committed spec.** `specs/features/<slug>.feature` must be
    committed on this branch (`git ls-files --error-unmatch`, clean in
-   `git status`). If not, stop and point to `/spec-feature`. Don't write the
+   `git status`). If not, stop and point to `/devflow:spec-feature`. Don't write the
    feature yourself.
 2. **Dispatch `coder`, verify its commit.** Run the verify command yourself
    (below). **Then QA, if the project configures a QA command:**
@@ -46,8 +46,8 @@ With `--from-hardener`, do steps 4-5 only; every hardener verification still run
 ## Dispatching
 
 - **Coder → commit → hardener, one after the other, on the feature branch.**
-  Dispatch `subagent_type: "coder"`; verify its commit; stop for the playtest;
-  then dispatch `subagent_type: "hardener"` with the coder's sha. The commit is
+  Dispatch `subagent_type: "devflow:coder"`; verify its commit; stop for the playtest;
+  then dispatch `subagent_type: "devflow:hardener"` with the coder's sha. The commit is
   the handoff: the hardener starts from a clean diff, and each role's work can
   be checked on its own.
 - **Default to these agents, not `/fork`.** A tight prompt on a pinned cheap

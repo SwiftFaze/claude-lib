@@ -58,11 +58,11 @@ gets built. Pay the approval latency only where being wrong is expensive.
    ask what's still open.
 3. **Human approval, high-risk path only**: stop and wait. Do not proceed on
    your own.
-4. **Implementation** (`coder`, `.claude/agents/coder.md`): **run Steps 4-7
+4. **Implementation** (`coder` agent, `devflow:coder`): **run Steps 4-7
    through the `implement-issue` skill**. It owns the coder → commit →
    playtest → hardener handoff, prompt contents, verifying what comes back,
    and where the PR fits. The Clean Code gate belongs to the hardener
-   (`.claude/agents/hardener.md`), not this step.
+   (`devflow:hardener`), not this step.
     - **Test-first.** Write the failing test before the code that passes it.
       Uncle Bob's three laws of TDD are the default loop, not an aspiration.
     - **Respect the module dependency direction** the project's architecture
@@ -119,7 +119,7 @@ only, never to complexity, length, coverage, or the module rule.
 
 **SLAP (Single Level of Abstraction) is not enforced**: no tool backs it.
 It's design guidance from the `uncle-bob-craft` checklist the hardener
-applies (`.claude/agents/hardener.md`); don't describe it as a build gate.
+applies (`devflow:hardener`); don't describe it as a build gate.
 
 These thresholds are a deliberate dial for agent-authored code, not a constant.
 If you change one, record the new value and the reasoning here; don't loosen a

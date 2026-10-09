@@ -6,14 +6,14 @@ description: Given a GitHub issue number, bootstrap Step 1 of the spec-first wor
 Entry point into the spec-first pipeline (`.claude/workflow.md`) when the
 intent already lives in a GitHub issue rather than being dictated fresh.
 Produces the same `specs/intent/<slug>.md` Step 1 normally requires —
-`/spec-feature` picks up from there exactly as it would for a hand-written
+`/devflow:spec-feature` picks up from there exactly as it would for a hand-written
 intent doc. Do not write a `.feature` file or any implementation code in
 this skill.
 
 Takes one input: a GitHub issue number (or URL). If not given, ask for it
 — don't guess which issue.
 
-Optional suffix **`parallel`** (`/spec-intent 140 parallel`): start the work
+Optional suffix **`parallel`** (`/devflow:spec-intent 140 parallel`): start the work
 in its own git worktree instead of switching this checkout's branch. Use it
 when other sessions or agents are already working in the current checkout —
 a plain run would `--checkout` the new branch out from under them. Only
@@ -130,7 +130,7 @@ rest of the pipeline will run.
 
 One short summary: branch name (created + checked out), issue linked and
 moved to In progress, and the intent doc's path. Tell the user the next
-step is `/spec-feature <slug>` once they're happy with the intent doc —
+step is `/devflow:spec-feature <slug>` once they're happy with the intent doc —
 don't start that step yourself.
 
 **Parallel variant:** report the worktree path instead of "checked out", and
