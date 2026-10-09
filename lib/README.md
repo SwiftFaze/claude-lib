@@ -5,17 +5,25 @@ development pipeline: intent doc → Gherkin spec → test-first implementation
 (`coder`) → clean-code hardening and mutation testing (`hardener`) → PR, with
 GitHub issues, milestones and a project board for planning.
 
-## Install into a project
+## Layout
 
-| From this repo  | To the project          |
-|-----------------|-------------------------|
-| `workflow.md`   | `.claude/workflow.md`   |
-| `agents/`       | `.claude/agents/`       |
-| `skills/`       | `.claude/skills/`       |
-| `tools/`        | `.claude/tools/`        |
-| `specs/`        | `specs/` (repo root)    |
+This repo is checked out as `~/.claude` itself. Its `.gitignore` ignores
+everything (credentials, history, sessions) except the library:
 
-Then:
+- `skills/`, `agents/`: user-level, so Claude Code loads them in every project.
+- `lib/`: per-project templates that only take effect once copied into a
+  project (below).
+
+## Set up a project
+
+| From `~/.claude/lib` | To the project          |
+|----------------------|-------------------------|
+| `workflow.md`        | `.claude/workflow.md`   |
+| `tools/`             | `.claude/tools/`        |
+| `specs/`             | `specs/` (repo root)    |
+
+The pipeline skills and agents stay global; they read the project's
+`.claude/workflow.md`. Then:
 
 1. Fill in the **Project configuration** table and the **Constraints** values
    at the top of `.claude/workflow.md`. Every skill and agent refers to those

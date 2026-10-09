@@ -81,7 +81,11 @@ Registry entry, keyed by `owner/repo`:
 Then read the context before judging anything:
 - the repo's rules (`rules.txt`: AGENTS.md, CLAUDE.md, CONTRIBUTING, ADRs, test and CI docs);
 - its glossary, if it has one;
-- the previous report for this repo and topic. Parse its `<script id="review-data">` JSON to get the open findings and their IDs. Older Markdown reports: read their findings section.
+- the previous report for this repo and topic. Parse its `<script id="review-data">` JSON to get the open findings and their IDs. Older Markdown reports: read their findings section. If it has a `brainstorm-data` block (from `/brainstorm-repo-review`), also follow up its drafts:
+  - was each draft filed (`gh issue list --search "<title>"`)?
+  - is the filed issue open or closed?
+  - did the fix land?
+  - decisions deferred to someone else: were they settled?
 
 ## 4. Investigate: the deep dive
 
@@ -128,7 +132,7 @@ For each finding, record:
 
 ## 5. Write the HTML report
 
-Start from `assets/report-template.html`. Keep its CSS tokens, the filter script, the pinned Mermaid import and the `review-data` JSON block. Fill in the placeholders and delete sections that would be empty. Write in the registry's `language` for that repo (default English).
+Start from `assets/report-template.html`. Keep its CSS tokens, the chart kit, the tooltip and filter scripts, and the `review-data` JSON block. The report has no external scripts or CDN: it works offline, prints, and follows light and dark mode. Fill in the placeholders and delete sections that would be empty. Write in the registry's `language` for that repo (default English).
 
 - **Title:** names the review, for example "Test coverage review", "CI/CD review", "Activity review: 1–9 Oct", or "Full health check". Put it in `<title>`, `<h1>` and the JSON block, together with the date, the repo and the scope chips.
 - **Structure:**
@@ -140,14 +144,28 @@ Start from `assets/report-template.html`. Keep its CSS tokens, the filter script
   6. To check.
   7. Previous review follow-up.
   8. Recommended actions: numbered, most important first. For each one: which finding IDs it covers, whether it needs a new issue, a comment on an existing issue or a decision, and who would do it.
-- **Finding cards:** one `<article class="finding <severity>" id="<ID>" data-sev="<severity>">` each, with ID, title, badges, location, What, Why it matters, Fix, and the evidence collapsed in `<details>`.
-- **Diagrams:** use Mermaid when a picture explains faster than prose:
-  - a timeline or gitGraph for a period;
-  - a flowchart of a pipeline or of the call path behind a bug;
-  - a pie of coverage or CI minutes;
-  - before/after flowcharts for architecture candidates.
+- **Finding cards:** one `<article class="finding <severity>" id="<ID>" data-sev="<severity>">` each, with ID, title, badges, location, What, Why it matters, Fix, and the evidence collapsed in `<details>`. The template's script folds each card to its title line by default, so keep `<header>` as a direct child of the card. Everything else in the card is the body that opens, location included.
+- **Charts and diagrams:** use the template's built-in chart kit (plain HTML and CSS) when a picture explains something faster than prose. Pick the form from the job:
 
-  Inside Mermaid nodes, avoid `|`, `;` and `#`. Escape `<`, `>` and `&` in all HTML text, and in code inside `<pre>`.
+  | Job | Kit piece |
+  |---|---|
+  | Ranked magnitudes (untested lines per folder, fixes per file, CI minutes per workflow) | `.bars` bar list |
+  | Parts of one whole (actions by test level, run outcomes) | `.stack` proportion bar with `.legend`. Never a pie. |
+  | A value over time (CI minutes per day, commits per day) | `.cols` columns |
+  | A pipeline, or the call path behind a bug | `.flow` steps marked `ok` / `warn` / `bad`, grouped with `.flow-group` |
+  | What happened in a period | `.timeline` |
+  | An architecture candidate | `.compare` before/after with `.box`, `.box.deep`, `.box.leak` |
+  | One headline number | a stat tile, not a chart |
+
+  Rules:
+  - Every chart has a title and visible value labels.
+  - Every bar list and column chart also has a `<details>` table view.
+  - Put `data-tip` on rows and segments for the hover tooltip.
+  - Use at most the four categorical slots `s1`–`s4`, in order. Use `.rest` for the remainder in a stack.
+  - Status colours (`sev-*`, `ok`/`warn`/`bad`) carry meaning only together with words, never colour alone.
+  - `--v` is a percentage of the largest value for bars and columns, and the raw value for stack segments.
+  - Escape `<`, `>` and `&` in all HTML text, including code inside `<pre>`.
+- **Look at it.** Run `node scripts/screenshot.cjs <report.html> <out-dir> [repo-path]` and open the three PNGs (light, dark, 390 px wide). Fix any label collision, empty bar, or horizontal overflow before finishing. If no browser is available, say that the layout wasn't checked.
 - **JSON:** the `review-data` block lists every finding (`id`, `title`, `severity`, `verdict`, `status`, `where`, `area`). It must be valid JSON. Check it with `node -e` or `python -c` before finishing.
 
 ## 6. Update the registry
