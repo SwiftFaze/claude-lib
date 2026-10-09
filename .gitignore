@@ -1,0 +1,9 @@
+# ~/.claude holds credentials, history and session data: ignore everything,
+# then let only the library through.
+/*
+!/.gitignore
+!/skills/
+!/agents/
+!/lib/
+/skills/synced/
+/skills/.trash/

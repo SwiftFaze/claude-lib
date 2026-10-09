@@ -69,7 +69,7 @@ Also look for flaky patterns (sleeps, real clocks, order dependence), skipped or
 
 **Where:** `.github/workflows/*`, deploy scripts, `workflows.txt`, `ci-runs.txt`, `ci-failures.txt`, `ci-minutes.txt`, the branch and release rules.
 
-- **The path to prod, end to end.** What gates each step (tests, lint, typecheck, build, security scan, manual approval)? Can a step be skipped: `if:` conditions, `continue-on-error`, `paths-ignore`, `workflow_dispatch` shortcuts? Draw it as a Mermaid flowchart.
+- **The path to prod, end to end.** What gates each step (tests, lint, typecheck, build, security scan, manual approval)? Can a step be skipped: `if:` conditions, `continue-on-error`, `paths-ignore`, `workflow_dispatch` shortcuts? Draw it as a `.flow` diagram (the template's chart kit).
 - **Is what runs in CI what the rules say runs?** Compare the workflows with AGENTS.md or CONTRIBUTING step by step.
 - **Reliability:** failure rate per workflow, recurring failures, cancelled runs that hid a red result, flaky jobs.
 - **Secrets and permissions:** the `permissions:` block per workflow, `pull_request_target`, secrets reaching fork PRs, third-party actions pinned by SHA or by tag.
@@ -99,7 +99,7 @@ Also look for flaky patterns (sleeps, real clocks, order dependence), skipped or
 - **God files:** files over ~1,000 lines that change often. Show their churn.
 - **Testability:** which areas are hard to test through their current interface?
 
-Don't re-argue a decision an ADR records unless the friction is real; say so explicitly. For each candidate, give the files, the problem (one sentence), the solution (one sentence), the gains, and a before/after diagram (Mermaid flowchart, or boxes built in HTML). Rate each one *Strong*, *Worth exploring* or *Speculative*.
+Don't re-argue a decision an ADR records unless the friction is real; say so explicitly. For each candidate, give the files, the problem (one sentence), the solution (one sentence), the gains, and a before/after diagram (`.compare` with `.box`, `.box.deep`, `.box.leak`). Rate each one *Strong*, *Worth exploring* or *Speculative*.
 
 ## data: database and migrations
 

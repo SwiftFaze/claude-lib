@@ -84,8 +84,75 @@ th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: v
 .finding dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 8px 0 0; }
 .finding dt { font-weight: 600; font-size: 13px; color: var(--muted); } .finding dd { margin: 0; }
 details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 8px; }
+/* Folded finding cards (screen only; print shows everything). Only the title line stays visible. */
+@media screen { #findings .finding.folded > :not(header) { display: none; } }
+#findings .finding > header[role="button"] { cursor: pointer; }
+#findings .finding > header[role="button"]::before { content: "▸"; color: var(--muted); font-size: 12px; display: inline-block; transition: transform .15s; }
+#findings .finding:not(.folded) > header[role="button"]::before { transform: rotate(90deg); }
+#findings .finding > header[role="button"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+.filters .fold-all { margin-left: auto; }
+.good-note { border-left: 4px solid var(--good); color: var(--good); font-weight: 600; }
 .callout { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 12px 16px; }
-.mermaid-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow-x: auto; }
+/* ---- Chart kit: plain HTML/CSS, no library, no CDN. ----
+   Series colours = validated dataviz palette (light + dark, adjacent CVD ΔE ≥ 8.4).
+   Light slots 3–4 sit under 3:1 on the surface, so every chart keeps visible
+   value labels and a table view. Text always wears ink tokens, never series colours. */
+:root { --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --seq: #2a78d6; --rest: #9a9ea8; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --seq: #3987e5; --rest: #4b505b; }
+}
+:root[data-theme="dark"] { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --seq: #3987e5; --rest: #4b505b; }
+.viz { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+.viz h4 { margin: 0; font-size: 15px; }
+.viz .viz-sub { color: var(--muted); font-size: 13px; margin: 2px 0 12px; }
+.viz details { margin-top: 10px; } .viz details table { margin-top: 6px; }
+.s1 { background: var(--s1); } .s2 { background: var(--s2); } .s3 { background: var(--s3); } .s4 { background: var(--s4); }
+.sev-critical { background: var(--crit); } .sev-high { background: var(--high); } .sev-medium { background: var(--med); }
+.sev-low { background: var(--low); } .sev-good { background: var(--good); }
+.rest { background: var(--rest); } /* the remainder in a stack: neutral, recedes in both themes */
+/* Bar list: one magnitude per row, sorted, value label at the end. */
+.bars { display: grid; grid-template-columns: minmax(90px, max-content) 1fr max-content; gap: 6px 10px; align-items: center; font-size: 13px; }
+.bars .row { display: contents; }
+.bars .lbl { overflow-wrap: anywhere; }
+.bars .bar-wrap { display: block; height: 12px; }
+.bars .bar { display: block; height: 12px; width: var(--v); min-width: 2px; background: var(--seq); border-radius: 0 4px 4px 0; }
+.bars .val { font-variant-numeric: tabular-nums; text-align: right; }
+/* Stacked proportion bar (instead of a pie): segments split by a 2px gap, plus a labelled legend. */
+.stack { display: flex; gap: 2px; height: 22px; }
+.stack span { display: block; flex: var(--v) 1 0; min-width: 3px; }
+.stack span:first-child { border-radius: 4px 0 0 4px; } .stack span:last-child { border-radius: 0 4px 4px 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; margin-top: 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+/* Columns over time (CI minutes per day, commits per day). */
+.cols { display: flex; align-items: flex-end; gap: 2px; height: 140px; border-bottom: 1px solid var(--line); }
+.cols span { flex: 1; height: var(--v); min-height: 2px; background: var(--seq); border-radius: 4px 4px 0 0; }
+.cols-axis { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 4px; }
+/* Flow: pipeline or call path. Steps wrap on narrow screens. */
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.flow .step { flex: 1 1 140px; border: 1px solid var(--line); border-left-width: 4px; border-radius: 8px; padding: 8px 10px; background: var(--bg); font-size: 13px; }
+.flow .step b { display: block; } .flow .step small { color: var(--muted); }
+.flow .step.ok { border-left-color: var(--good); } .flow .step.warn { border-left-color: var(--med); } .flow .step.bad { border-left-color: var(--crit); }
+.flow .arrow { align-self: center; color: var(--muted); font-size: 18px; }
+.flow-group { flex: 1 1 100%; border: 1px dashed var(--line); border-radius: 10px; padding: 8px; }
+.flow-group > .gl { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 6px; }
+/* Timeline of a period. */
+.timeline { list-style: none; margin: 0; padding: 0 0 0 18px; border-left: 2px solid var(--line); }
+.timeline li { position: relative; margin: 0 0 12px; font-size: 14px; }
+.timeline li::before { content: ""; position: absolute; left: -25px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--seq); box-shadow: 0 0 0 2px var(--surface); }
+.timeline li.bad::before { background: var(--crit); } .timeline li.ok::before { background: var(--good); }
+.timeline time { display: block; font-size: 12px; color: var(--muted); }
+/* Before / after, for architecture candidates. */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.compare > div { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--bg); }
+.compare h5 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.box { border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; margin: 4px 0; font-size: 13px; background: var(--surface); }
+.box.deep { border: 2px solid var(--ink); font-weight: 600; } .box.leak { border-color: var(--crit); }
+/* Hover tooltip (any element with data-tip). */
+[data-tip] { cursor: default; }
+#tip { position: fixed; z-index: 10; pointer-events: none; display: none; max-width: 300px;
+  background: var(--ink); color: var(--bg); font-size: 12px; padding: 4px 8px; border-radius: 6px; }
+@media (max-width: 600px) { .compare { grid-template-columns: 1fr; } .flow .arrow { display: none; } .flow .step { flex-basis: 100%; } }
+@media print { .viz { break-inside: avoid; } }
 ol.actions li { margin: 8px 0; }
 footer { margin-top: 56px; color: var(--muted); font-size: 13px; }
 @media (max-width: 600px) { .meta, .finding dl { grid-template-columns: 1fr; } h1 { font-size: 24px; } }
@@ -134,14 +201,77 @@ footer { margin-top: 56px; color: var(--muted); font-size: 13px; }
   </table>
 </section>
 
-<!-- Optional picture section: a Mermaid diagram when a picture explains faster than prose. -->
+<!-- Optional picture section. Chart kit catalogue below: keep only the pieces that explain
+     something faster than prose, and delete the rest. Every chart has a title, visible value labels,
+     and a <details> table view. --v is a percentage of the largest value (bars, columns) or the raw
+     value (stack segments). Put data-tip on the row or segment for the hover tooltip. -->
 <section id="picture">
   <h2>{{What happened | Where things stand}}</h2>
-  <div class="mermaid-card"><pre class="mermaid">
-pie title {{Example}}
-    "Tested" : 20
-    "Untested" : 80
-  </pre></div>
+
+  <!-- Bar list: ranked magnitudes (untested lines per folder, CI minutes per workflow, fixes per file). -->
+  <figure class="viz">
+    <h4>{{Untested lines by folder}}</h4>
+    <p class="viz-sub">{{Files with no test touching them, lines of code}}</p>
+    <div class="bars">
+      <div class="row" data-tip="{{src/server: 45 files, 8,046 lines}}"><span class="lbl">{{src/server}}</span><span class="bar-wrap"><span class="bar" style="--v:100%"></span></span><span class="val">{{8,046}}</span></div>
+      <div class="row" data-tip="{{src/lib: 25 files, 2,584 lines}}"><span class="lbl">{{src/lib}}</span><span class="bar-wrap"><span class="bar" style="--v:32%"></span></span><span class="val">{{2,584}}</span></div>
+    </div>
+    <details><summary>Table</summary><table><thead><tr><th>Folder</th><th>Untested lines</th></tr></thead>
+      <tbody><tr><td>{{src/server}}</td><td>{{8,046}}</td></tr><tr><td>{{src/lib}}</td><td>{{2,584}}</td></tr></tbody></table></details>
+  </figure>
+
+  <!-- Stacked proportion bar: parts of one whole (use instead of a pie). Max 4 categorical slots,
+       s1..s4 in that order; status meaning uses sev-* classes instead. -->
+  <figure class="viz">
+    <h4>{{Server actions by test level}}</h4>
+    <p class="viz-sub">{{395 exported actions}}</p>
+    <div class="stack" role="img" aria-label="{{12 integration, 8 unit, 375 untested}}">
+      <span class="s1" style="--v:12" data-tip="{{Integration test: 12}}"></span>
+      <span class="s2" style="--v:8" data-tip="{{Unit test: 8}}"></span>
+      <span class="rest" style="--v:375" data-tip="{{No test: 375}}"></span>
+    </div>
+    <div class="legend"><span><i class="s1"></i>{{Integration · 12}}</span><span><i class="s2"></i>{{Unit · 8}}</span><span><i class="rest"></i>{{No test · 375}}</span></div>
+  </figure>
+
+  <!-- Columns over time: one value per day or week. -->
+  <figure class="viz">
+    <h4>{{CI minutes per day}}</h4>
+    <p class="viz-sub">{{Billed minutes, all workflows · peak 210 on 08/10}}</p>
+    <div class="cols" role="img" aria-label="{{CI minutes per day, 01/10 to 09/10}}">
+      <span style="--v:40%" data-tip="{{01/10: 84 min}}"></span><span style="--v:100%" data-tip="{{08/10: 210 min}}"></span>
+    </div>
+    <div class="cols-axis"><span>{{01/10}}</span><span>{{09/10}}</span></div>
+    <details><summary>Table</summary><table><thead><tr><th>Day</th><th>Minutes</th></tr></thead><tbody><tr><td>{{01/10}}</td><td>{{84}}</td></tr></tbody></table></details>
+  </figure>
+
+  <!-- Flow: a pipeline or the call path behind a bug. ok / warn / bad mark each step's state;
+       say the state in words too (never colour alone). Group steps with .flow-group. -->
+  <figure class="viz">
+    <h4>{{Path to production}}</h4>
+    <div class="flow">
+      <div class="step ok"><b>{{PR checks}}</b><small>{{unit, lint, types · 5 min}}</small></div><span class="arrow" aria-hidden="true">→</span>
+      <div class="step warn"><b>{{Nightly Playwright}}</b><small>{{9 tests · never gated yet}}</small></div><span class="arrow" aria-hidden="true">→</span>
+      <div class="step bad"><b>{{Staging}}</b><small>{{manual runs skip the gate}}</small></div>
+    </div>
+  </figure>
+
+  <!-- Timeline: what happened in a period (activity reviews). -->
+  <figure class="viz">
+    <h4>{{The period}}</h4>
+    <ol class="timeline">
+      <li class="ok"><time>{{08/10 afternoon}}</time>{{Integration tests in CI (#682)}}</li>
+      <li class="bad"><time>{{09/10}}</time>{{Staging deployed by hand 4 times}}</li>
+    </ol>
+  </figure>
+
+  <!-- Before / after: architecture candidates. .box = module, .box.deep = deep module, .box.leak = leaking seam. -->
+  <figure class="viz">
+    <h4>{{Move the view filter into one module}}</h4>
+    <div class="compare">
+      <div><h5>Before</h5><div class="box leak">{{screen filter (copy 1)}}</div><div class="box leak">{{PDF filter (copy 2, drifted)}}</div></div>
+      <div><h5>After</h5><div class="box deep">{{level-filter.ts: one tested interface}}</div><div class="box">{{screen, PDF, DXF call it}}</div></div>
+    </div>
+  </figure>
 </section>
 
 <section id="findings">
@@ -150,7 +280,9 @@ pie title {{Example}}
     <button data-f="all" aria-pressed="true">All</button>
     <button data-f="critical">Critical</button><button data-f="high">High</button>
     <button data-f="medium">Medium</button><button data-f="low">Low</button>
+    <button type="button" class="fold-all">Expand all</button>
   </div>
+  <p id="filter-empty" class="callout good-note" role="status" hidden></p>
 
   <h3>{{Group heading, e.g. "Bugs (confirmed)" or "Tenant isolation"}}</h3>
   <article class="finding high" id="{{T-01}}" data-sev="high">
@@ -216,18 +348,71 @@ pie title {{Example}}
 }
 </script>
 
-<script type="module">
-  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
-  const t = document.documentElement.dataset.theme;
-  const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-  mermaid.initialize({ startOnLoad: true, theme: dark ? "dark" : "neutral", securityLevel: "strict" });
-</script>
 <script>
-  document.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
-    document.querySelectorAll(".filters button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  // Hover tooltip for any [data-tip] element (chart rows, segments, columns).
+  const tip = document.createElement("div");
+  tip.id = "tip";
+  document.body.append(tip);
+  document.addEventListener("pointerover", (e) => {
+    const t = e.target.closest("[data-tip]");
+    tip.style.display = t ? "block" : "none";
+    if (t) tip.textContent = t.dataset.tip;
+  });
+  document.addEventListener("pointermove", (e) => {
+    tip.style.left = Math.min(e.clientX + 12, innerWidth - 310) + "px";
+    tip.style.top = e.clientY + 14 + "px";
+  });
+
+  // Severity filter for the finding cards: each button shows its count; a group
+  // heading hides when nothing under it is visible; an empty level says so.
+  const cards = [...document.querySelectorAll("#findings .finding")];
+  const empty = document.getElementById("filter-empty");
+  document.querySelectorAll(".filters button[data-f]").forEach((b) => {
     const f = b.dataset.f;
-    document.querySelectorAll("#findings .finding").forEach((el) => { el.hidden = f !== "all" && el.dataset.sev !== f; });
-  }));
+    const n = f === "all" ? cards.length : cards.filter((c) => c.dataset.sev === f).length;
+    b.dataset.label = b.textContent;
+    b.textContent = b.textContent + " · " + n;
+    b.addEventListener("click", () => {
+      document.querySelectorAll(".filters button[data-f]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      cards.forEach((el) => { el.hidden = f !== "all" && el.dataset.sev !== f; });
+      document.querySelectorAll("#findings h3").forEach((h) => {
+        let any = false;
+        for (let s = h.nextElementSibling; s && s.tagName !== "H3"; s = s.nextElementSibling)
+          if (s.matches(".finding") && !s.hidden) any = true;
+        h.hidden = !any;
+      });
+      empty.hidden = n > 0;
+      empty.textContent = n > 0 ? "" : "No " + b.dataset.label.toLowerCase() + " findings: all good at this level.";
+    });
+  });
+  // Folding: cards start folded; click or Enter/Space on the title opens one; a link
+  // to #T-05 opens that card; "Expand all" toggles every card.
+  const setOpen = (card, open) => {
+    card.classList.toggle("folded", !open);
+    card.querySelector("header").setAttribute("aria-expanded", String(open));
+  };
+  cards.forEach((card) => {
+    const head = card.querySelector("header");
+    head.setAttribute("role", "button");
+    head.tabIndex = 0;
+    setOpen(card, false);
+    head.addEventListener("click", (e) => { if (!e.target.closest("a")) setOpen(card, card.classList.contains("folded")); });
+    head.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(card, card.classList.contains("folded")); }
+    });
+  });
+  const foldAll = document.querySelector(".filters .fold-all");
+  foldAll.addEventListener("click", () => {
+    const open = foldAll.textContent === "Expand all";
+    cards.forEach((c) => setOpen(c, open));
+    foldAll.textContent = open ? "Collapse all" : "Expand all";
+  });
+  const openFromHash = () => {
+    const t = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (t && t.matches("#findings .finding")) { t.hidden = false; setOpen(t, true); t.scrollIntoView(); }
+  };
+  addEventListener("hashchange", openFromHash);
+  openFromHash();
 </script>
 </body>
 </html>
