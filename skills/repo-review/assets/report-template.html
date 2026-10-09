@@ -1,0 +1,233 @@
+<!doctype html>
+<!--
+  repo-review report template. Copy, then replace every {{…}} and the example blocks.
+  Keep: the review-data JSON block (the next review reads it), the CSS tokens, the filter script.
+  Delete any section that would be empty rather than writing "none".
+-->
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{Title}} — {{owner/repo}} — {{YYYY-MM-DD}}</title>
+<style>
+:root {
+  --bg: #fbfaf7; --surface: #ffffff; --ink: #1c1d21; --muted: #5d6170; --line: #e4e2dc;
+  --accent: #3b5bdb; --code-bg: #f3f2ee;
+  --crit: #b42318; --crit-bg: #fde8e6; --high: #c4540a; --high-bg: #fdeedd;
+  --med: #8a6d00; --med-bg: #fbf3d0; --low: #475467; --low-bg: #eef0f3;
+  --good: #1f7a4d; --good-bg: #e2f4ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15161a; --surface: #1d1f24; --ink: #e8e8ea; --muted: #a2a6b2; --line: #31343c;
+    --accent: #8ea6ff; --code-bg: #24262c;
+    --crit: #ff8a7a; --crit-bg: #3a1d1a; --high: #ffb072; --high-bg: #3a2717;
+    --med: #f0d264; --med-bg: #353014; --low: #b7bfcc; --low-bg: #262a31;
+    --good: #6fd3a0; --good-bg: #16302a;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15161a; --surface: #1d1f24; --ink: #e8e8ea; --muted: #a2a6b2; --line: #31343c;
+  --accent: #8ea6ff; --code-bg: #24262c;
+  --crit: #ff8a7a; --crit-bg: #3a1d1a; --high: #ffb072; --high-bg: #3a2717;
+  --med: #f0d264; --med-bg: #353014; --low: #b7bfcc; --low-bg: #262a31;
+  --good: #6fd3a0; --good-bg: #16302a;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 980px; margin: 0 auto; padding: 32px 16px 80px; }
+h1 { font: 600 30px/1.2 Georgia, "Times New Roman", serif; margin: 0 0 6px; }
+h2 { font: 600 21px/1.3 Georgia, serif; margin: 44px 0 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+h3 { font-size: 16px; margin: 26px 0 8px; }
+a { color: var(--accent); }
+code, pre { font: 13px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.sub { color: var(--muted); margin: 0 0 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 18px; }
+.chip { font-size: 12px; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
+.meta { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; font-size: 14px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.meta dt { color: var(--muted); } .meta dd { margin: 0; }
+nav.toc { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line);
+  padding: 8px 0; margin: 20px 0 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 16px 0; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+.tile b { display: block; font-size: 24px; line-height: 1.2; }
+.tile span { color: var(--muted); font-size: 13px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: block; overflow-x: auto; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.v-good { color: var(--good); font-weight: 600; } .v-mixed { color: var(--med); font-weight: 600; } .v-bad { color: var(--crit); font-weight: 600; }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 14px; }
+.filters button { font: inherit; font-size: 13px; padding: 3px 12px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.filters button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.finding { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--low);
+  border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+.finding.critical { border-left-color: var(--crit); } .finding.high { border-left-color: var(--high); }
+.finding.medium { border-left-color: var(--med); } .finding.low { border-left-color: var(--low); }
+.finding.good { border-left-color: var(--good); }
+.finding header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.finding h4 { margin: 0; font-size: 16px; flex: 1 1 320px; }
+.fid { font: 600 12px ui-monospace, monospace; color: var(--muted); }
+.badge { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; padding: 2px 8px; border-radius: 999px; }
+.b-critical { color: var(--crit); background: var(--crit-bg); } .b-high { color: var(--high); background: var(--high-bg); }
+.b-medium { color: var(--med); background: var(--med-bg); } .b-low { color: var(--low); background: var(--low-bg); }
+.b-confirmed { color: var(--good); background: var(--good-bg); } .b-plausible { color: var(--med); background: var(--med-bg); }
+.b-new, .b-open, .b-worse, .b-fixed { color: var(--muted); background: var(--low-bg); }
+.b-fixed { color: var(--good); background: var(--good-bg); } .b-worse { color: var(--crit); background: var(--crit-bg); }
+.where { font-size: 13px; color: var(--muted); margin: 6px 0; }
+.finding dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 8px 0 0; }
+.finding dt { font-weight: 600; font-size: 13px; color: var(--muted); } .finding dd { margin: 0; }
+details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 8px; }
+.callout { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 12px 16px; }
+.mermaid-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; overflow-x: auto; }
+ol.actions li { margin: 8px 0; }
+footer { margin-top: 56px; color: var(--muted); font-size: 13px; }
+@media (max-width: 600px) { .meta, .finding dl { grid-template-columns: 1fr; } h1 { font-size: 24px; } }
+@media print { nav.toc, .filters { display: none; } .finding, .tile { break-inside: avoid; } body { background: #fff; } }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+  <h1>{{Title, e.g. "Test coverage review"}}</h1>
+  <p class="sub">{{owner/repo}} · {{YYYY-MM-DD}}</p>
+  <div class="chips">
+    <span class="chip">Scope: {{full scan at <code>abc1234</code> | since 2026-10-01 (last review)}}</span>
+    <span class="chip">Topic: {{all | tests | ci | …}}</span>
+    <span class="chip">Branch: {{develop}}</span>
+  </div>
+  <dl class="meta">
+    <dt>Reviewed</dt><dd>{{state or period, with commit SHAs}}</dd>
+    <dt>Previous review</dt><dd>{{<a href="2026-10-01-all-since.html">2026-10-01 — Activity review</a> | first review}}</dd>
+    <dt>Covered in depth</dt><dd>{{…}}</dd>
+    <dt>Skimmed / not covered</dt><dd>{{…, and why}}</dd>
+    <dt>Method</dt><dd>{{collector/inventory, N parallel investigators on X/Y/Z, every finding re-verified in code, commands run}}</dd>
+  </dl>
+</header>
+
+<nav class="toc">
+  <a href="#summary">Summary</a><a href="#findings">Findings</a><a href="#good">Good</a>
+  <a href="#to-check">To check</a><a href="#follow-up">Follow-up</a><a href="#actions">Actions</a>
+</nav>
+
+<section id="summary">
+  <h2>Summary</h2>
+  <p>{{3–6 sentences: what the state is, the verdict, the 1–3 things that matter most.}}</p>
+  <div class="tiles">
+    <div class="tile"><b>{{5 137}}</b><span>{{unit tests, all green}}</span></div>
+    <div class="tile"><b>{{3}}</b><span>{{confirmed bugs}}</span></div>
+  </div>
+  <table>
+    <thead><tr><th>Area</th><th>Verdict</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>{{Unit tests}}</td><td class="v-good">Good</td><td>{{one line}}</td></tr>
+      <tr><td>{{Server actions}}</td><td class="v-bad">Problem</td><td>{{one line}}</td></tr>
+      <tr><td>{{CI}}</td><td class="v-mixed">Mixed</td><td>{{one line}}</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Optional picture section: a Mermaid diagram when a picture explains faster than prose. -->
+<section id="picture">
+  <h2>{{What happened | Where things stand}}</h2>
+  <div class="mermaid-card"><pre class="mermaid">
+pie title {{Example}}
+    "Tested" : 20
+    "Untested" : 80
+  </pre></div>
+</section>
+
+<section id="findings">
+  <h2>Findings</h2>
+  <div class="filters" role="group" aria-label="Filter by severity">
+    <button data-f="all" aria-pressed="true">All</button>
+    <button data-f="critical">Critical</button><button data-f="high">High</button>
+    <button data-f="medium">Medium</button><button data-f="low">Low</button>
+  </div>
+
+  <h3>{{Group heading, e.g. "Bugs (confirmed)" or "Tenant isolation"}}</h3>
+  <article class="finding high" id="{{T-01}}" data-sev="high">
+    <header>
+      <span class="fid">{{T-01}}</span>
+      <h4>{{One-line claim: what is wrong}}</h4>
+      <span class="badge b-high">high</span>
+      <span class="badge b-confirmed">confirmed</span>
+      <span class="badge b-new">new</span>
+    </header>
+    <p class="where"><code>{{src/app/actions/account.ts:45}}</code> · {{#123}}</p>
+    <dl>
+      <dt>What</dt><dd>{{the defect or gap, concretely}}</dd>
+      <dt>Why it matters</dt><dd>{{concrete failure scenario: input/state → wrong outcome}}</dd>
+      <dt>Fix</dt><dd>{{suggested change, and the test that proves it}}</dd>
+    </dl>
+    <details><summary>Evidence</summary><pre><code>{{quoted code or command output}}</code></pre></details>
+  </article>
+</section>
+
+<section id="good">
+  <h2>Good</h2>
+  <article class="finding good"><header><h4>{{Specific credit: what, where, why it is good}}</h4></header>
+    <p class="where"><code>{{path}}</code></p></article>
+</section>
+
+<section id="to-check">
+  <h2>To check (not confirmed)</h2>
+  <ul><li><b>{{X-01}}</b> {{suspicion, what would confirm it, where to look}}</li></ul>
+</section>
+
+<section id="follow-up">
+  <h2>Previous review follow-up</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Finding</th><th>Status</th><th>Evidence</th></tr></thead>
+    <tbody><tr><td>{{T-03}}</td><td>{{title}}</td><td><span class="badge b-open">still open</span></td><td>{{file:line or PR}}</td></tr></tbody>
+  </table>
+</section>
+
+<section id="actions">
+  <h2>Recommended actions</h2>
+  <ol class="actions">
+    <li><b>{{Action}}</b> — {{covers T-01, T-02}} · {{new issue | comment on #123 | decision}} · {{who}}</li>
+  </ol>
+</section>
+
+<footer>Generated by the repo-review skill · {{collected_at UTC}} · {{repo}}@{{sha}}</footer>
+</main>
+
+<!-- Machine-readable summary. The next review reads this to follow up each finding by ID. Keep it valid JSON. -->
+<script type="application/json" id="review-data">
+{
+  "repo": "{{owner/repo}}",
+  "date": "{{YYYY-MM-DD}}",
+  "title": "{{Title}}",
+  "scope": "{{full|since}}",
+  "since": "{{ISO or null}}",
+  "topic": "{{all|tests|ci|…}}",
+  "heads": { "{{branch}}": "{{sha}}" },
+  "findings": [
+    { "id": "T-01", "title": "…", "severity": "high", "verdict": "confirmed", "status": "new", "where": "src/…:45", "area": "…" }
+  ]
+}
+</script>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
+  const t = document.documentElement.dataset.theme;
+  const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  mermaid.initialize({ startOnLoad: true, theme: dark ? "dark" : "neutral", securityLevel: "strict" });
+</script>
+<script>
+  document.querySelectorAll(".filters button").forEach((b) => b.addEventListener("click", () => {
+    document.querySelectorAll(".filters button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+    const f = b.dataset.f;
+    document.querySelectorAll("#findings .finding").forEach((el) => { el.hidden = f !== "all" && el.dataset.sev !== f; });
+  }));
+</script>
+</body>
+</html>
