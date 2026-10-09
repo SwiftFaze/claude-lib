@@ -1,0 +1,15 @@
+{
+  "name": "claude-lib",
+  "description": "Spec-first agentic development pipeline for Claude Code.",
+  "owner": {
+    "name": "rwoolley",
+    "url": "https://github.com/SwiftFaze"
+  },
+  "plugins": [
+    {
+      "name": "devflow",
+      "description": "Spec-first agentic pipeline (intent, Gherkin spec, coder/hardener agents, PR), GitHub planning skills, repo reviews and code-craft review.",
+      "source": "./skills/devflow"
+    }
+  ]
+}
