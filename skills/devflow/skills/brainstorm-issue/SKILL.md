@@ -8,7 +8,7 @@ This is the *pre-intent* version of Step 1 in the spec-first workflow
 (`.claude/workflow.md`): same shape of thinking, but the destination is a
 GitHub issue, not `specs/intent/<slug>.md`. Never write to `specs/intent/`
 or `specs/features/` in this skill — if the user wants that, they'll ask for
-`/spec-feature` instead (or say so mid-brainstorm; if they do, stop and
+`/devflow:spec-feature` instead (or say so mid-brainstorm; if they do, stop and
 hand off rather than writing the file yourself).
 
 "The project board" below is the setting in `.claude/workflow.md`'s project
@@ -131,7 +131,7 @@ date. Before adding the issue(s) to the project board:
    Write a short **thematic** description (the goal/arc, not a list of
    tasks — task lists go stale as scope shifts). If the idea looks big
    enough to need several issues rather than just this one, stop and
-   suggest `/brainstorm-milestone` instead of creating a single-issue
+   suggest `/devflow:brainstorm-milestone` instead of creating a single-issue
    milestone here. Otherwise:
    ```
    gh api repos/{owner}/{repo}/milestones -f title="<n>. <Title>" -f state="open" -f description="<theme>"

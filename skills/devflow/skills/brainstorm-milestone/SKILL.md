@@ -6,7 +6,7 @@ description: Plan a big feature out loud, split it into a sequence of GitHub iss
 
 This is `brainstorm-issue` scaled up to a whole feature arc: same
 pre-intent, straight-to-GitHub shape (no `specs/intent/` or
-`specs/features/` writes — hand off to `/spec-intent`/`/spec-feature` if
+`specs/features/` writes — hand off to `/devflow:spec-intent`/`/devflow:spec-feature` if
 the user wants that pipeline instead), but the destination is a
 **milestone plus its issues**, not a single issue. Reach for
 `brainstorm-issue` instead when the idea is a single self-contained

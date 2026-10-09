@@ -26,10 +26,10 @@ Arguments are free text. Read these out of them:
 | **repo** | a path or `owner/repo` | the current working directory's git repo |
 
 Examples:
-- `/repo-review` → since the last review, everything.
-- `/repo-review full tests` → whole repo, test coverage and quality.
-- `/repo-review since 2026-10-01 ci` → CI/CD changes since 1 October.
-- `/repo-review security` → full security scan.
+- `/devflow:repo-review` → since the last review, everything.
+- `/devflow:repo-review full tests` → whole repo, test coverage and quality.
+- `/devflow:repo-review since 2026-10-01 ci` → CI/CD changes since 1 October.
+- `/devflow:repo-review security` → full security scan.
 
 `since last` uses the registry: the latest `history` entry for the same topic, otherwise `last_run`. First review of a repo with no date given: ask how far back to go, suggesting 7 days.
 
@@ -81,7 +81,7 @@ Registry entry, keyed by `owner/repo`:
 Then read the context before judging anything:
 - the repo's rules (`rules.txt`: AGENTS.md, CLAUDE.md, CONTRIBUTING, ADRs, test and CI docs);
 - its glossary, if it has one;
-- the previous report for this repo and topic. Parse its `<script id="review-data">` JSON to get the open findings and their IDs. Older Markdown reports: read their findings section. If it has a `brainstorm-data` block (from `/brainstorm-repo-review`), also follow up its drafts:
+- the previous report for this repo and topic. Parse its `<script id="review-data">` JSON to get the open findings and their IDs. Older Markdown reports: read their findings section. If it has a `brainstorm-data` block (from `/devflow:brainstorm-repo-review`), also follow up its drafts:
   - was each draft filed (`gh issue list --search "<title>"`)?
   - is the filed issue open or closed?
   - did the fix land?

@@ -10,4 +10,4 @@ Skill for applying Robert C. Martin (Uncle Bob) criteria to **code review and pr
 These two files are the complete skill — no separate deep-reference folder
 or companion skill to consult beyond them.
 
-Use with `@uncle-bob-craft`. Does not replace the project linter, formatter, or the mechanical constraints in `.claude/workflow.md` ("Constraints").
+Use with `/devflow:uncle-bob-craft`. Does not replace the project linter, formatter, or the mechanical constraints in `.claude/workflow.md` ("Constraints").
