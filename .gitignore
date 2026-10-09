@@ -2,6 +2,7 @@
 # then let only the library through.
 /*
 !/.gitignore
+!/.claude-plugin/
 !/skills/
 !/agents/
 !/lib/

@@ -5,6 +5,25 @@ development pipeline: intent doc → Gherkin spec → test-first implementation
 (`coder`) → clean-code hardening and mutation testing (`hardener`) → PR, with
 GitHub issues, milestones, a project board and repo reviews for planning.
 
+## Install
+
+In Claude Code:
+
+```
+/plugin install devflow --marketplace SwiftFaze/claude-lib
+```
+
+On Claude Code older than 2.1.275, add the marketplace first, then install:
+
+```
+/plugin marketplace add SwiftFaze/claude-lib
+/plugin install devflow@claude-lib
+```
+
+Update later with `/plugin marketplace update claude-lib`. The per-project
+templates in `lib/` are not part of the plugin; copy them from this repo (see
+[Set up a project for the pipeline](#set-up-a-project-for-the-pipeline)).
+
 ## Layout
 
 This repo is checked out as `~/.claude` itself. Its `.gitignore` ignores
@@ -13,6 +32,7 @@ everything (credentials, history, sessions, settings) except the library:
 | Path                  | What it is                                                         |
 |-----------------------|--------------------------------------------------------------------|
 | `skills/devflow/`  | The **`devflow` plugin**: `.claude-plugin/plugin.json`, `skills/`, `agents/` |
+| `.claude-plugin/`     | `marketplace.json`, so the repo can be added as a plugin marketplace |
 | `lib/`                | Per-project templates: `workflow.md`, `tools/`, `specs/`           |
 
 A folder in `~/.claude/skills/` that has a `.claude-plugin/plugin.json` loads
