@@ -23,6 +23,9 @@ document it. You **refactor only**: behavior stays the same.
   lens. Neither makes implementation code human-reviewed.
 - `.claude/workflow.md` **Step 6** (mutation testing) and **Step 7**
   (documentation decision, including user-facing docs). Read both before starting.
+  If the configured mutation command mutates the whole project, or re-runs
+  acceptance suites for every mutant, scope your run to the changed classes
+  and report the unscoped command as a configuration gap.
 
 ## Does not own: new behavior
 

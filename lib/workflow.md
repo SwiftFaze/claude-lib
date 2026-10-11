@@ -13,7 +13,7 @@ instead of hard-coding a stack, a repo or a board. Replace the examples.
 | Verify command      | `mvn verify`: build, every test suite, coverage and structural gates              |
 | Scenario command    | `mvn test -Dcucumber.filter.name="<scenario>"`: runs one acceptance scenario      |
 | Run command         | `mvn compile exec:java`: launches the app for the human playtest                  |
-| Mutation command    | `mvn pitest:mutationCoverage`, report in `target/pit-reports/`                    |
+| Mutation command    | `mvn pitest:mutationCoverage`, scoped per Step 6; report in `target/pit-reports/` |
 | QA command          | none, or a scripted replay per `.feature` (see `tools/check-qa-coverage.sh`)      |
 | Clean Code gate     | `bash .claude/tools/check-clean.sh`                                               |
 | Project board       | GitHub project `<number>`, owner `<owner>`; fields `Status`, `Priority` (`P0`/`P1`/`P2`) |
@@ -83,7 +83,10 @@ gets built. Pay the approval latency only where being wrong is expensive.
       test infrastructure changed.
 6. **Mutation testing** (`hardener`, after the gate is clean): the mutation
    command against new/changed code (the check on the unit tests; confirm the
-   new classes are in the mutation tool's target list).
+   new classes are in the mutation tool's target list). Scope it in the
+   configured command, not by hand: target only the changed classes and keep
+   slow acceptance suites out of the per-mutant test run. Unscoped, a few
+   changed lines can cost tens of minutes.
 7. **Documentation** (`hardener`, same agent as Step 6): part of done, not
    cleanup:
     - New domain concept, non-obvious design decision, or a deviation from an
