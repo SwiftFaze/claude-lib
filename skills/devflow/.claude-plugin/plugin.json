@@ -1,7 +1,7 @@
 {
   "name": "devflow",
   "description": "Spec-first agentic pipeline (intent, Gherkin spec, coder/hardener agents, PR), GitHub planning skills, repo reviews and code-craft review.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": {
     "name": "rwoolley"
   }
